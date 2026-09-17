@@ -1,69 +1,112 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main dir="rtl" className="min-h-screen bg-[#090909] text-white">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#090909]/95 backdrop-blur-xl">
+        <div className="mx-auto flex h-[78px] max-w-6xl items-center justify-between px-5">
+          <button className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xl">
+            🛒
+          </button>
+
+          <button className="text-center">
+            <div className="text-3xl font-black tracking-tight">
+              <span className="text-red-500">7</span>
+              <span className="text-white">BOB</span>
+            </div>
+            <div className="text-[10px] font-bold tracking-[0.35em] text-white/45">
+              STORE
+            </div>
+          </button>
+
+          <button className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xl">
+            ☰
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      <section className="mx-auto max-w-6xl px-5 pb-10 pt-12">
+        <div className="overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-red-950/40 via-[#111] to-[#090909] p-7 shadow-2xl">
+          <div className="max-w-2xl">
+            <div className="mb-5 inline-flex rounded-full border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm text-red-400">
+              شحن سريع • خدمة موثوقة
+            </div>
+
+            <h1 className="text-4xl font-black leading-tight sm:text-6xl">
+              مرحباً بك في
+              <br />
+              <span className="text-red-500">7</span>BOB STORE
+            </h1>
+
+            <p className="mt-5 max-w-xl text-lg leading-8 text-white/55">
+              متجرك لشحن الألعاب والخدمات الرقمية بطريقة سهلة وسريعة.
+            </p>
+
+            <button className="mt-8 rounded-2xl bg-red-600 px-7 py-4 font-bold transition hover:bg-red-500">
+              استكشف المنتجات
+            </button>
+          </div>
         </div>
-      </main>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 pb-12">
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <p className="text-sm text-red-500">7BOB STORE</p>
+            <h2 className="mt-1 text-2xl font-black">خدماتنا</h2>
+          </div>
+          <span className="text-sm text-white/35">اختر الخدمة</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Service title="eFootball" subtitle="شحن العملات" />
+          <Service title="المحفظة" subtitle="إدارة رصيدك" />
+          <Service title="طلباتي" subtitle="تابع طلباتك" />
+          <Service title="حسابي" subtitle="إعدادات الحساب" />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 pb-16">
+        <div className="rounded-[28px] border border-white/10 bg-white/[0.025] p-6">
+          <h2 className="text-2xl font-black">لماذا 7BOB؟</h2>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <Feature title="سرعة التنفيذ" text="نعمل على تنفيذ طلبك بأسرع وقت ممكن." />
+            <Feature title="واجهة بسيطة" text="تجربة واضحة ومريحة من البداية للنهاية." />
+            <Feature title="دعم العملاء" text="يمكنك التواصل معنا عند الحاجة للمساعدة." />
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-white/5 px-5 py-8 text-center">
+        <div className="text-2xl font-black">
+          <span className="text-red-500">7</span>BOB
+        </div>
+        <p className="mt-2 text-sm text-white/35">
+          متجرك الرقمي للألعاب والخدمات
+        </p>
+        <p className="mt-5 text-xs text-white/20">
+          © 2026 7BOB STORE
+        </p>
+      </footer>
+    </main>
+  );
+}
+
+function Service({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <button className="group rounded-[24px] border border-white/10 bg-white/[0.025] p-5 text-right transition hover:border-red-500/30 hover:bg-red-500/[0.05]">
+      <div className="mb-8 h-11 w-11 rounded-2xl bg-red-500/10 ring-1 ring-red-500/20" />
+      <h3 className="text-lg font-bold">{title}</h3>
+      <p className="mt-1 text-sm text-white/40">{subtitle}</p>
+    </button>
+  );
+}
+
+function Feature({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-white/5 bg-black/20 p-5">
+      <div className="mb-4 h-2 w-10 rounded-full bg-red-500" />
+      <h3 className="font-bold">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-white/40">{text}</p>
     </div>
   );
 }
