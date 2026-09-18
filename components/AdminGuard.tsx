@@ -19,17 +19,21 @@ export default function AdminGuard({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
   const [loggingIn, setLoggingIn] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
       if (
-        currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+        currentUser?.email?.toLowerCase() ===
+        ADMIN_EMAIL.toLowerCase()
       ) {
         setUser(currentUser);
       } else {
@@ -55,7 +59,8 @@ export default function AdminGuard({
       );
 
       if (
-        result.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()
+        result.user.email?.toLowerCase() !==
+        ADMIN_EMAIL.toLowerCase()
       ) {
         await signOut(auth);
         throw new Error("Unauthorized");
@@ -70,7 +75,6 @@ export default function AdminGuard({
   async function resetPassword() {
     setError("");
     setMessage("");
-
     setResetting(true);
 
     try {
@@ -79,9 +83,11 @@ export default function AdminGuard({
       setMessage(
         "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريد المدير."
       );
-    } catch {
+    } catch (error: any) {
+      console.error("PASSWORD_RESET_ERROR:", error);
       setError(
-        "تعذر إرسال رسالة إعادة التعيين. تأكد من إعدادات البريد في Firebase."
+        error?.code ||
+          "تعذر إرسال رسالة إعادة تعيين كلمة المرور."
       );
     } finally {
       setResetting(false);
@@ -98,7 +104,9 @@ export default function AdminGuard({
         dir="rtl"
         className="flex min-h-screen items-center justify-center bg-[#080808] text-white"
       >
-        <div className="text-white/50">جاري التحقق...</div>
+        <div className="text-white/50">
+          جاري التحقق...
+        </div>
       </main>
     );
   }
@@ -149,16 +157,18 @@ export default function AdminGuard({
             className="mb-3 w-full rounded-2xl border border-white/10 bg-[#111] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-red-500/50"
           />
 
-          <button
-            type="button"
-            onClick={resetPassword}
-            disabled={resetting}
-            className="mb-5 text-sm text-white/50 transition hover:text-white"
-          >
-            {resetting
-              ? "جاري إرسال الرابط..."
-              : "نسيت كلمة المرور؟"}
-          </button>
+          <div className="mb-5 text-right">
+            <button
+              type="button"
+              onClick={resetPassword}
+              disabled={resetting}
+              className="text-sm text-white/50 transition hover:text-white"
+            >
+              {resetting
+                ? "جاري إرسال الرابط..."
+                : "نسيت كلمة المرور؟"}
+            </button>
+          </div>
 
           {error && (
             <div className="mb-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
