@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   User,
 } from "firebase/auth";
@@ -21,11 +22,15 @@ export default function AdminGuard({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+      if (
+        currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+      ) {
         setUser(currentUser);
       } else {
         setUser(null);
@@ -39,6 +44,7 @@ export default function AdminGuard({
     e.preventDefault();
 
     setError("");
+    setMessage("");
     setLoggingIn(true);
 
     try {
@@ -48,14 +54,37 @@ export default function AdminGuard({
         password
       );
 
-      if (result.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      if (
+        result.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()
+      ) {
         await signOut(auth);
-        throw new Error("هذا الحساب غير مصرح له بالدخول.");
+        throw new Error("Unauthorized");
       }
     } catch {
       setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
     } finally {
       setLoggingIn(false);
+    }
+  }
+
+  async function resetPassword() {
+    setError("");
+    setMessage("");
+
+    setResetting(true);
+
+    try {
+      await sendPasswordResetEmail(auth, ADMIN_EMAIL);
+
+      setMessage(
+        "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريد المدير."
+      );
+    } catch {
+      setError(
+        "تعذر إرسال رسالة إعادة التعيين. تأكد من إعدادات البريد في Firebase."
+      );
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -117,12 +146,29 @@ export default function AdminGuard({
             placeholder="كلمة المرور"
             autoComplete="current-password"
             required
-            className="mb-4 w-full rounded-2xl border border-white/10 bg-[#111] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-red-500/50"
+            className="mb-3 w-full rounded-2xl border border-white/10 bg-[#111] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-red-500/50"
           />
+
+          <button
+            type="button"
+            onClick={resetPassword}
+            disabled={resetting}
+            className="mb-5 text-sm text-white/50 transition hover:text-white"
+          >
+            {resetting
+              ? "جاري إرسال الرابط..."
+              : "نسيت كلمة المرور؟"}
+          </button>
 
           {error && (
             <div className="mb-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-sm text-white/70">
+              {message}
             </div>
           )}
 
@@ -131,7 +177,9 @@ export default function AdminGuard({
             disabled={loggingIn}
             className="w-full rounded-2xl bg-red-500 px-5 py-4 font-bold transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loggingIn ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+            {loggingIn
+              ? "جاري تسجيل الدخول..."
+              : "تسجيل الدخول"}
           </button>
         </form>
       </main>
