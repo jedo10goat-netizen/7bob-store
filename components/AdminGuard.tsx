@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import {
-  GoogleAuthProvider,
   onAuthStateChanged,
-  signInWithPopup,
+  signInWithEmailAndPassword,
   signOut,
   User,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+
+const ADMIN_EMAIL = "jedo10goat@gmail.com";
 
 export default function AdminGuard({
   children,
@@ -17,17 +18,45 @@ export default function AdminGuard({
 }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+
       setLoading(false);
     });
   }, []);
 
-  async function login() {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+  async function login(e: React.FormEvent) {
+    e.preventDefault();
+
+    setError("");
+    setLoggingIn(true);
+
+    try {
+      const result = await signInWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
+
+      if (result.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        await signOut(auth);
+        throw new Error("هذا الحساب غير مصرح له بالدخول.");
+      }
+    } catch {
+      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
+    } finally {
+      setLoggingIn(false);
+    }
   }
 
   async function logout() {
@@ -51,30 +80,60 @@ export default function AdminGuard({
         dir="rtl"
         className="flex min-h-screen items-center justify-center bg-[#080808] px-5 text-white"
       >
-        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0d0d0d] p-8 text-center">
-          <div className="mb-2 text-4xl font-black">
+        <form
+          onSubmit={login}
+          className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0d0d0d] p-8"
+        >
+          <div className="mb-2 text-center text-4xl font-black">
             <span className="text-red-500">7</span>BOB
           </div>
 
-          <div className="mb-8 text-xs tracking-[0.3em] text-white/30">
+          <div className="mb-8 text-center text-xs tracking-[0.3em] text-white/30">
             STORE ADMIN
           </div>
 
-          <h1 className="mb-3 text-2xl font-bold">
-            لوحة الإدارة
+          <h1 className="mb-3 text-center text-2xl font-bold">
+            تسجيل دخول الإدارة
           </h1>
 
-          <p className="mb-7 text-sm leading-6 text-white/40">
-            سجّل الدخول بحساب Google للوصول إلى لوحة الإدارة.
+          <p className="mb-7 text-center text-sm text-white/40">
+            أدخل بيانات حساب المدير للوصول إلى لوحة الإدارة.
           </p>
 
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="البريد الإلكتروني"
+            autoComplete="email"
+            required
+            className="mb-3 w-full rounded-2xl border border-white/10 bg-[#111] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-red-500/50"
+          />
+
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="كلمة المرور"
+            autoComplete="current-password"
+            required
+            className="mb-4 w-full rounded-2xl border border-white/10 bg-[#111] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-red-500/50"
+          />
+
+          {error && (
+            <div className="mb-4 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-sm text-red-400">
+              {error}
+            </div>
+          )}
+
           <button
-            onClick={login}
-            className="w-full rounded-2xl bg-red-500 px-5 py-4 font-bold transition hover:bg-red-600"
+            type="submit"
+            disabled={loggingIn}
+            className="w-full rounded-2xl bg-red-500 px-5 py-4 font-bold transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            تسجيل الدخول باستخدام Google
+            {loggingIn ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
           </button>
-        </div>
+        </form>
       </main>
     );
   }
