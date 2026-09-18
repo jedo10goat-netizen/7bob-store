@@ -30,7 +30,7 @@ export default function AdminGuard({
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (
         currentUser?.email?.toLowerCase() ===
         ADMIN_EMAIL.toLowerCase()
@@ -42,6 +42,8 @@ export default function AdminGuard({
 
       setLoading(false);
     });
+
+    return unsubscribe;
   }, []);
 
   async function login(e: React.FormEvent) {
@@ -63,10 +65,19 @@ export default function AdminGuard({
         ADMIN_EMAIL.toLowerCase()
       ) {
         await signOut(auth);
-        throw new Error("Unauthorized");
+        setUser(null);
+        setError("هذا الحساب غير مصرح له بدخول الإدارة.");
+        return;
       }
-    } catch {
-      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
+
+      setUser(result.user);
+    } catch (error: any) {
+      console.error("LOGIN_ERROR:", error);
+
+      setError(
+        error?.code ||
+          "حدث خطأ أثناء تسجيل الدخول."
+      );
     } finally {
       setLoggingIn(false);
     }
@@ -85,9 +96,10 @@ export default function AdminGuard({
       );
     } catch (error: any) {
       console.error("PASSWORD_RESET_ERROR:", error);
+
       setError(
         error?.code ||
-          "تعذر إرسال رسالة إعادة تعيين كلمة المرور."
+          "تعذر إرسال رابط إعادة تعيين كلمة المرور."
       );
     } finally {
       setResetting(false);
@@ -95,7 +107,12 @@ export default function AdminGuard({
   }
 
   async function logout() {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("LOGOUT_ERROR:", error);
+    }
   }
 
   if (loading) {
@@ -162,7 +179,7 @@ export default function AdminGuard({
               type="button"
               onClick={resetPassword}
               disabled={resetting}
-              className="text-sm text-white/50 transition hover:text-white"
+              className="text-sm text-white/50 transition hover:text-white disabled:opacity-50"
             >
               {resetting
                 ? "جاري إرسال الرابط..."
@@ -200,6 +217,7 @@ export default function AdminGuard({
     <div>
       <div className="fixed left-4 top-4 z-50">
         <button
+          type="button"
           onClick={logout}
           className="rounded-xl border border-white/10 bg-[#111] px-4 py-2 text-xs text-white/60 transition hover:text-white"
         >
